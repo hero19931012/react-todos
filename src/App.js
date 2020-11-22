@@ -1,11 +1,13 @@
 import './App.css';
-import { useState } from 'react'
-import TodoItem from './TodoItem';
-import { TodoWrapper, Todos, Title, TodoInputForm, TodoInput, TodoInputButton, TodoDeleteAllButton, TodoDFilterAll, TodoFilterDone, TodoFilterUndone, TodoActionWrapper } from './Components'
+import { useState, useEffect } from 'react'
+import Todo from './Todo';
 
 let id = 2;
 
 export default function App() {
+
+  const [inputValue, setInputValue] = useState('')
+
   const [todos, setTodos] = useState([
     {
       id: 1,
@@ -15,23 +17,21 @@ export default function App() {
     },
   ])
 
-  const [value, setValue] = useState('')
-
   const handleInputChange = (e) => {
-    setValue(e.target.value)
+    setInputValue(e.target.value)
   }
 
   const handleAddTodo = (e) => {
     e.preventDefault();
-    if (!value) return;
+    if (!inputValue) return;
     setTodos([{
       id,
-      content: value,
+      content: inputValue,
       isDone: false,
       display: true
     }, ...todos])
 
-    setValue('');
+    setInputValue('');
     id++
   }
 
@@ -90,26 +90,22 @@ export default function App() {
     setTodos([])
   }
 
+  useEffect(() => {
+    document.title = 'React TodoList'
+  }, [])
+
   return (
-    <TodoWrapper>
-      <Title>Todo List</Title>
-      <TodoInputForm onSubmit={handleAddTodo}>
-        <TodoInput onChange={handleInputChange} value={value} placeholder="input something here..." />
-        <TodoInputButton type="submit" >新增</TodoInputButton>
-      </TodoInputForm>
-      <Todos>
-        {
-          todos.map(todo => {
-            return todo.display === true ? <TodoItem key={todo.id} todo={todo} handleToggleIsDone={handleToggleIsDone} handleDeleteTodo={handleDeleteTodo}></TodoItem> : ''
-          })
-        }
-      </Todos>
-      <TodoActionWrapper>
-        <TodoDFilterAll onClick={handleListAll}>列出全部</TodoDFilterAll>
-        <TodoFilterDone onClick={handleListDone}>列出已完成</TodoFilterDone>
-        <TodoFilterUndone onClick={handleListUndone}>列出未完成</TodoFilterUndone>
-        <TodoDeleteAllButton onClick={handleDeleteAll}>清空</TodoDeleteAllButton>
-      </TodoActionWrapper>
-    </TodoWrapper>
-  );
+    <Todo
+      todos={todos}
+      inputValue={inputValue}
+      handleInputChange={handleInputChange}
+      handleAddTodo={handleAddTodo}
+      handleToggleIsDone={handleToggleIsDone}
+      handleDeleteTodo={handleDeleteTodo}
+      handleListAll={handleListAll}
+      handleListDone={handleListDone}
+      handleListUndone={handleListUndone}
+      handleDeleteAll={handleDeleteAll}
+    />
+  )
 }
